@@ -3,11 +3,11 @@ package gameshop;
 
 public class GameInventory {
 	    public static final GameInformation[] Gamemenu = new GameInformation[]{
-	            new GameInformation("Mario", "adventure", 800000),
-	            new GameInformation("Scoobydoo", "horror", 250000),
-	            new GameInformation("StreetFighting", "fighting", 100000000),
+	            new GameInformation("Mario", "adventure", 800),
+	            new GameInformation("Scoobydoo", "horror", 250),
+	            new GameInformation("StreetFighting", "fighting", 100),
 	            new GameInformation("Kurby", "adventure", 220),
-	            new GameInformation("Hon", "Moba", 1),
+	            new GameInformation("Hon", "Moba", 50),
 	    };
 
 	    public static GameInformation[] ShowAllgame() {
@@ -32,4 +32,17 @@ public class GameInventory {
 	    	}
 	    	return price1;
 	    }
+	    
+	    public static String getDetail(String game) {
+	    	String details = "";
+	    	for(int i = 0; i < Gamemenu.length; i++) {
+	    		if(game.equals(Gamemenu[i].getName())) {
+	    			details = Gamemenu[i].getDetails();
+	    			
+	    		} 
+	    	}
+	    	return details;
+	    }
 }
+
+

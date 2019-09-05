@@ -18,7 +18,7 @@ public class GameInformation implements Cloneable {
 
     public void setName(String name) {
         if (name.length() == 0) {
-            this.gamename = "Unnamed Ice Cream Menu";
+            this.gamename = "Unknown";
         } else {
             this.gamename = name;
         }

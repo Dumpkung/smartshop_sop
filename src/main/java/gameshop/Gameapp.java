@@ -7,15 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import main.IceCreamMenu;
-import main.SpringBootApp;
-
 @SpringBootApplication
 @RestController
 public class Gameapp {
 	public static ArrayList<String> Game = new ArrayList<String>();
 	double price, pricecancle;
-	String allgame = "You have buy  ", allgamebuy, gamecancle;
+	String allgame = "You have buy  ", allgamebuy, gamecancle, gamedetails;
 	int state = 0;
 	
     public static void main(String[] args) {
@@ -34,49 +31,77 @@ public class Gameapp {
 
     @RequestMapping(value = "/game/buy/{select}")
     String BuyGame(@PathVariable int select) throws CloneNotSupportedException {
-    	if(Game.contains(GameInventory.ShowGame(select).getName())) {
-    		return "You have baught it.Are you want to buy again ^ ^?";
+    	System.out.println(Game);
+    	if(Game.contains(GameInventory.ShowGame(select-1).getName())) {
+    		System.out.println(Game);
+    		return "You have baught it.You can't buy again ^ ^?";
     	} else {
-    		Game.add(GameInventory.ShowGame(select).getName());
-        	price += GameInventory.ShowGame(select).getPrice();
-            return "Buying  " + GameInventory.ShowGame(select).getName() + "  Success";
+    		Game.add(GameInventory.ShowGame(select-1).getName());
+        	price += GameInventory.ShowGame(select-1).getPrice();
+        	System.out.println(Game);
+            return "Buying  " + GameInventory.ShowGame(select-1).getName() + "  Price: " + GameInventory.ShowGame(select-1).getPrice() + " Bath Success";
+            
     	}
     }
     
     @RequestMapping(value = "/game/cancle/{select}")
     String cancleGame(@PathVariable int select) throws CloneNotSupportedException {
-    	pricecancle = GameInventory.getPriceofgame(Game.get(select-1));
-    	gamecancle = Game.get(select-1);
-    	price -= pricecancle;
-    	Game.remove(select-1);
-    	return "Success Cancle Order  " + gamecancle;
+    	System.out.println(Game);
+    	if(Game.size() >= select) {
+	    	pricecancle = GameInventory.getPriceofgame(Game.get(select-1));
+	    	gamecancle = Game.get(select-1);
+	    	price -= pricecancle;
+	    	Game.remove(Game.get(select-1));
+	    	System.out.println(Game);
+    	} else {
+    		System.out.println(Game);
+    		return "You can't cancle this order";
+    	}
+    	return "Success Cancle Order  " + gamecancle + "  Price  " + pricecancle + " Bath";
     }
     
     @RequestMapping(value = "/watch")
     String busket() {
-    	allgamebuy = "";
-    	for(int i = 0; i < Game.size(); i++) {
-    		String convert = Integer.toString(i+1);
-    		allgamebuy += convert + ". " + Game.get(i);
-    		if(i < Game.size()-1) {
-    			allgamebuy += "\n";
-    		}
+    	System.out.println(Game);
+    	if(Game.size() > 0) {
+    		allgamebuy = "";
+        	for(int i = 0; i < Game.size(); i++) {
+        		gamedetails = GameInventory.getDetail(Game.get(i));
+        		pricecancle = GameInventory.getPriceofgame(Game.get(i));
+        		String convert = Integer.toString(i+1);
+        		allgamebuy += convert + ". " + Game.get(i) + "  Details:  " + gamedetails + "  Price: " + pricecancle + " Bath";
+        		allgamebuy += "\n";
+        	}
+        	System.out.println(Game);
+        	return allgamebuy;
+    	} else {
+    		System.out.println(Game);
+    		return "Don't have any order";
     	}
-    	return allgamebuy;
+    	
     }
 
     @RequestMapping("/exit")
     String exit() {
-    	allgame = "You have buy  ";
-    	for(int i = 0; i < Game.size(); i++) {
-    		allgame += Game.get(i);
-    		if(i < Game.size()-1) {
-    			allgame += ", ";
-    		}
+    	System.out.println(Game);
+    	if(Game.size() > 0) {
+    		allgame = "You have buy  ";
+        	for(int i = 0; i < Game.size(); i++) {
+        		allgame += Game.get(i);
+        		if(i < Game.size()-1) {
+        			allgame += ",  ";
+        		}
+        	}
+        	String numberAsString = String.valueOf(price);
+        	allgame += "\nAllprice is: " + numberAsString;
+        	allgame += " Bath Thank you";
+        	System.out.println(Game);
+            return allgame;
+    	} else {
+    		System.out.println(Game);
+    		return "You don't have any order";
     	}
-    	String numberAsString = String.valueOf(price);
-    	allgame += "  " + numberAsString;
-    	allgame += " Bath Thank you";
-        return allgame;
+    	
     }
 }
+
