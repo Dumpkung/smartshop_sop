@@ -1,25 +1,23 @@
 package gameshop;
-
-
 public class GameInventory {
-	    public static final GameInformation[] Gamemenu = new GameInformation[]{
-	            new GameInformation("Mario", "adventure", 800),
-	            new GameInformation("Scoobydoo", "horror", 250),
-	            new GameInformation("StreetFighting", "fighting", 100),
-	            new GameInformation("Kurby", "adventure", 220),
-	            new GameInformation("Hon", "Moba", 50),
+	    public static final Game[] Gamemenu = new Game[]{
+	            new Game((long) 1, "Mario", 800),
+	            new Game((long) 2, "Scoobydoo", 250),
+	            new Game((long) 3, "StreetFighting", 100),
+	            new Game((long) 4, "Kurby", 220),
+	            new Game((long) 5, "Hon", 50),
 	    };
 
-	    public static GameInformation[] ShowAllgame() {
+	    public static Game[] ShowAllgame() {
 	        return Gamemenu;
 	    }
 	    
-	    public static GameInformation ShowGame(int select) {
-	        return (GameInformation) Gamemenu[select];
+	    public static Game ShowGame(int select) {
+	        return (Game) Gamemenu[select];
 	    }
 	    
-	    public static GameInformation getGamemenu(int select) throws CloneNotSupportedException {
-	        return (GameInformation) Gamemenu[select].clone();
+	    public static Game getGamemenu(int select) throws CloneNotSupportedException {
+	        return (Game) Gamemenu[select];
 	    }
 	     
 	    public static double getPriceofgame(String game) {
@@ -33,16 +31,15 @@ public class GameInventory {
 	    	return price1;
 	    }
 	    
-	    public static String getDetail(String game) {
-	    	String details = "";
-	    	for(int i = 0; i < Gamemenu.length; i++) {
-	    		if(game.equals(Gamemenu[i].getName())) {
-	    			details = Gamemenu[i].getDetails();
-	    			
-	    		} 
-	    	}
-	    	return details;
-	    }
+//	    public static String getDetail(String game) {
+//	    	String details = "";
+//	    	for(int i = 0; i < Gamemenu.length; i++) {
+//	    		if(game.equals(Gamemenu[i].getName())) {
+//	    			details = Gamemenu[i].getDetails();
+//	    			
+//	    		} 
+//	    	}
+//	    	return details;
+//	    }
 }
-
 

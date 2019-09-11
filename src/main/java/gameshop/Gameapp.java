@@ -1,107 +1,117 @@
 package gameshop;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
 public class Gameapp {
-	public static ArrayList<String> Game = new ArrayList<String>();
-	double price, pricecancle;
-	String allgame = "You have buy  ", allgamebuy, gamecancle, gamedetails;
-	int state = 0;
+	// the Singleton Alternative
+	public static ArrayList<Game> gamelist = new ArrayList<Game>();
+	String gamename, allgamebuy, allgame;
+	int pricegame, priceall;
+
+	@Autowired
+	private GameRepository gameRepository;
+
+	public static void main(String[] args) {
+		SpringApplication.run(Gameapp.class, args);
+	}
+
+	@GetMapping("/game")
+	public List<Game> showAllGame() {
+		return gameRepository.findAll();
+	}
+
+	@GetMapping("/game/{id}")
+	public Game showGame(@PathVariable long id) {
+		Optional<Game> game = gameRepository.findById(id);
+		return game.get();
+	}
+
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	public void addGame(@RequestBody Game game) {
+		gameRepository.save(game);
+	}
 	
-    public static void main(String[] args) {
-        SpringApplication.run(Gameapp.class, args);
-    }
+	@GetMapping(value = "/delete/{id}")
+	public void addGame(@PathVariable long id) {
+		gameRepository.deleteById(id);
+	}
 
-    @RequestMapping("/")
-    String home() {
-        return "Smart Game Shop";
-    }
+	@GetMapping(value = "/game/buy/{id}")
+	String BuyGame(@PathVariable long id) throws CloneNotSupportedException {
+		Optional<Game> game = gameRepository.findById(id);
+		if (gamelist.contains(game.get())) {
+			return "You have baught it.You can't buy again ^ ^?";
+		} else {
+			gamelist.add(game.get());
+			gameRepository.deleteById(id);
+			System.out.println(gamelist);
+			return "Buying  " + game.get().getName() + "  Price: " + game.get().getPrice() + " Bath Success";
 
-    @RequestMapping("/game")
-    GameInformation[] ShowAllgame() {
-        return GameInventory.ShowAllgame();
-    }
-
-    @RequestMapping(value = "/game/buy/{select}")
-    String BuyGame(@PathVariable int select) throws CloneNotSupportedException {
-    	System.out.println(Game);
-    	if(Game.contains(GameInventory.ShowGame(select-1).getName())) {
-    		System.out.println(Game);
-    		return "You have baught it.You can't buy again ^ ^?";
-    	} else {
-    		Game.add(GameInventory.ShowGame(select-1).getName());
-        	price += GameInventory.ShowGame(select-1).getPrice();
-        	System.out.println(Game);
-            return "Buying  " + GameInventory.ShowGame(select-1).getName() + "  Price: " + GameInventory.ShowGame(select-1).getPrice() + " Bath Success";
-            
-    	}
-    }
-    
-    @RequestMapping(value = "/game/cancle/{select}")
-    String cancleGame(@PathVariable int select) throws CloneNotSupportedException {
-    	System.out.println(Game);
-    	if(Game.size() >= select) {
-	    	pricecancle = GameInventory.getPriceofgame(Game.get(select-1));
-	    	gamecancle = Game.get(select-1);
-	    	price -= pricecancle;
-	    	Game.remove(Game.get(select-1));
-	    	System.out.println(Game);
-    	} else {
-    		System.out.println(Game);
-    		return "You can't cancle this order";
-    	}
-    	return "Success Cancle Order  " + gamecancle + "  Price  " + pricecancle + " Bath";
-    }
-    
+		}
+	}
+	//id-1 because when you watch you will see item list and number 1, 2, 3 but in array index begin at 0
+	@RequestMapping(value = "/game/cancle/{id}")
+	String cancleGame(@PathVariable int id) throws CloneNotSupportedException {
+		if (gamelist.size() >= (id-1)) {
+			gamename = gamelist.get(id-1).getName();
+			pricegame = gamelist.get(id-1).getPrice();
+			gameRepository.save(gamelist.get(id-1));
+			gamelist.remove(id-1);
+			System.out.println(gamelist);
+		} else {
+			return "You can't cancle this order";
+		}
+		return "Success Cancle Order  " + gamename + "  Price  " + pricegame + " Bath";
+	}
+  
     @RequestMapping(value = "/watch")
     String busket() {
-    	System.out.println(Game);
-    	if(Game.size() > 0) {
+    	if(gamelist.size() > 0) {
     		allgamebuy = "";
-        	for(int i = 0; i < Game.size(); i++) {
-        		gamedetails = GameInventory.getDetail(Game.get(i));
-        		pricecancle = GameInventory.getPriceofgame(Game.get(i));
+        	for(int i = 0; i < gamelist.size(); i++) {
         		String convert = Integer.toString(i+1);
-        		allgamebuy += convert + ". " + Game.get(i) + "  Details:  " + gamedetails + "  Price: " + pricecancle + " Bath";
+        		allgamebuy += convert + ". " + gamelist.get(i).getName() + "  Price: " + gamelist.get(i).getPrice() + " Bath";
         		allgamebuy += "\n";
         	}
-        	System.out.println(Game);
         	return allgamebuy;
     	} else {
-    		System.out.println(Game);
     		return "Don't have any order";
     	}
     	
-    }
-
+    }    
     @RequestMapping("/exit")
     String exit() {
-    	System.out.println(Game);
-    	if(Game.size() > 0) {
-    		allgame = "You have buy  ";
-        	for(int i = 0; i < Game.size(); i++) {
-        		allgame += Game.get(i);
-        		if(i < Game.size()-1) {
+    	priceall = 0;
+    	allgame = "";
+    	if(gamelist.size() > 0) {
+        	for(int i = 0; i < gamelist.size(); i++) {
+        		if(gamelist.get(i).getName().length() > 0) {
+        			allgame += gamelist.get(i).getName();
+            		priceall += gamelist.get(i).getPrice();
+        		}
+        		if(i < gamelist.size()-1) {
         			allgame += ",  ";
         		}
         	}
-        	String numberAsString = String.valueOf(price);
-        	allgame += "\nAllprice is: " + numberAsString;
+        	allgame += "\nAllprice is: " + priceall;
         	allgame += " Bath Thank you";
-        	System.out.println(Game);
-            return allgame;
+            return "You have buy  " + allgame ;
     	} else {
-    		System.out.println(Game);
     		return "You don't have any order";
     	}
     	
     }
 }
-
